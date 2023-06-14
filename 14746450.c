@@ -13,6 +13,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+// Auxiliary variables
+int day, month;
+
 // Adicione funções auxiliares se for necessário
 
 // GCD (greatest commom divisor) using Euclidean algorithm
@@ -46,6 +49,7 @@ int calculateLCM(int array[], int n)
   return result;
 }
 
+// Verify if year is leap
 bool isLeapYear(int year)
 {
   if ((!(year % 4) && year % 100) || !(year % 400))
@@ -54,6 +58,7 @@ bool isLeapYear(int year)
     return false;
 }
 
+// Validate date
 bool verificaDataValida(int d, int m, int a)
 {
   // Adicione seu código
@@ -97,6 +102,7 @@ bool verificaDataValida(int d, int m, int a)
   return true;
 }
 
+// date to day of the year (DOY)
 int countDays(int day, int month, int year)
 {
   int sum = 0;
@@ -110,6 +116,7 @@ int countDays(int day, int month, int year)
   return sum + day;
 }
 
+// Day of the year (DOY) to Date
 void countToDay(int count, int year)
 {
   int monthMaxDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 30, 31, 31};
@@ -123,7 +130,8 @@ void countToDay(int count, int year)
       break;
     count -= monthMaxDays[i];
   }
-  printf("%i/%i", count, i + 1);
+  day = count;
+  month = i + 1;
 }
 
 int main()
@@ -147,14 +155,14 @@ int main()
   // Adicione seu código
 
   int periodoAulas[] = {2, 3, 4, 5, 6};
-  int LCM = calculateLCM(periodoAulas, 5);
+  int LCM = calculateLCM(periodoAulas, sizeof(periodoAulas) / sizeof(int));
   int days = countDays(dia, mes, ano);
   printf("Proximos dias de encontro de todos os clubes:\n");
   while (days < (isLeapYear(ano) ? 366 : 365) - LCM)
   {
     days = days + LCM;
     countToDay(days, ano);
-    printf("/%i\n", ano);
+    printf("%i/%i/%i\n", day, month, ano);
   }
 
   return 0;

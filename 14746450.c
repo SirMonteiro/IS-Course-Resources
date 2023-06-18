@@ -69,7 +69,7 @@ bool verificaDataValida(int d, int m, int a)
 
   int maxDays;
 
-  switch (d)
+  switch (m)
   {
   case 2:
     // isLeapYear(a) ? maxDays = 29; : maxDays = 28;
@@ -81,7 +81,7 @@ bool verificaDataValida(int d, int m, int a)
   case 4:
   case 6:
   case 9:
-  case 10:
+  case 11:
     maxDays = 30;
     break;
   case 1:
@@ -89,7 +89,7 @@ bool verificaDataValida(int d, int m, int a)
   case 5:
   case 7:
   case 8:
-  case 11:
+  case 10:
   case 12:
     maxDays = 31;
     break;
@@ -106,7 +106,7 @@ bool verificaDataValida(int d, int m, int a)
 int countDays(int day, int month, int year)
 {
   int sum = 0;
-  int monthMaxDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 30, 31, 31};
+  int monthMaxDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   if (isLeapYear(year))
     monthMaxDays[1] = 29;
   for (int i = 0; i < (month - 1); i++)
@@ -119,7 +119,7 @@ int countDays(int day, int month, int year)
 // Day of the year (DOY) to Date
 void countToDay(int count, int year)
 {
-  int monthMaxDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 30, 31, 31};
+  int monthMaxDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
   if (isLeapYear(year))
     monthMaxDays[1] = 29;
 
@@ -157,6 +157,7 @@ int main()
   int periodoAulas[] = {2, 3, 4, 5, 6};
   int LCM = calculateLCM(periodoAulas, sizeof(periodoAulas) / sizeof(int));
   int days = countDays(dia, mes, ano);
+  printf("Data de inicio do ano letivo: %i/%i/%i\n", dia, mes, ano);
   printf("Proximos dias de encontro de todos os clubes:\n");
   while (days < (isLeapYear(ano) ? 366 : 365) - LCM)
   {

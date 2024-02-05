@@ -1,0 +1,147 @@
+---
+title: "work2"
+output: html_document
+date: "2023-06-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+sum(as.numeric(freq))
+```
+
+```{r}
+
+mediaFA = 6*28+18*20+30*169+42*131+54*103+66*112+78*7+90*39+114*52+126*18+138*12+150*18+162*15+186*3+198*75+354*11+450*136
+mediaFA = mediaFA / 949
+mediaFA
+
+```
+
+```{r}
+boxplot(prices, outline=FALSE)
+```
+
+```{r}
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+```
+
+```{r}
+boxplotInvestimentos = ggplot(data.frame(y = "Investimentos"), aes(y)) +
+  geom_boxplot(aes(ymin = min(prices), lower = quantile(prices, 0.25), middle = median(prices), upper = quantile(prices, 0.75), ymax = max(prices)), stat = "identity") +
+  #coord_cartesian(ylim=c(min(prices), max(prices))) #+
+  labs(title = "Boxplot de investimentos", x="") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 10))
+boxplotInvestimentos
+```
+```{r}
+ggsave("boxplotInvestimentos.png", boxplotInvestimentos, device="png")
+```
+
+```{r}
+"escore padronizado"
+"with max value"
+Zi = (max(prices) - mean(prices)) / sd(prices)
+Zi
+"with min value"
+Zi = (min(prices) - mean(prices)) / sd(prices)
+Zi
+```
+
+```{r}
+write.table(data.frame(prices), file="prices2.csv", row.names = FALSE, col.names= FALSE, sep=",")
+```
+
+```{r}
+write.table(data.frame(t(prices)), file="prices3.csv", row.names = FALSE, col.names= FALSE, sep=",")
+```
+
+```{r}
+"Média de preços em milhões dos foguetes projetados"
+prices = na.omit(rawData$Price)
+
+"mean"
+mean(prices)
+"median"
+median(prices)
+"mode"
+Mode(prices)
+
+"amplitude total"
+max(prices)-min(prices)
+"Variancia"
+var(prices)
+"Desvio padrão"
+sd(prices)
+
+"coeficiente de variacao"
+cv = sd(prices)/mean(prices)*100
+cv
+
+"min value"
+min(prices)
+"1 quantile"
+quantile(prices, 0.25)
+"3 quantile"
+quantile(prices, 0.75)
+"max value"
+max(prices)
+```
+
+```{r}
+boxplot(prices,outline=FALSE)
+```
+
+```{r}
+"Assimetria de Pearson"
+As = 3*(mean(prices) - median(prices))/sd(prices)
+As
+if (As > 0) {
+  "Assimetria Positiva ou à esquerda"
+} else if (As < 0) {
+  "Assimetria Negativa ou à direita"
+} else {
+  "Distribuição Simétrica"
+}
+```
+
+```{r}
+"Coeficiente percentílico de curtose"
+Cc = (quantile(prices, 0.75) - quantile(prices, 0.25)) / (2 * (quantile(prices, 0.9) - quantile(prices, 0.1)))
+Cc
+if (Cc > 0.263) {
+  "Distribuição platicúrtica"
+} else if (Cc < 0.263) {
+  "Distribuição leptocúrtica"
+} else {
+  "Distribuição mesocúrtica"
+}
+```

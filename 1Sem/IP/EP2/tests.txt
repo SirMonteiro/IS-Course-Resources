@@ -1,0 +1,3 @@
+for i in $(\ls -d ./dir1/*); do diff ${i} dir2; done
+
+for i in $(\ls testesEntradaa/); do diff <(./14746450 < testesEntradaa/${i}) testesSaidaa/${i}.out; done

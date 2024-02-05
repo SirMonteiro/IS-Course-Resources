@@ -1,0 +1,169 @@
+---
+title: "index"
+output: html_document
+date: "2023-04-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+# Read raw data
+rawData = read.csv("data/mission_launches.csv")
+
+# Convert price column to numeric
+rawData$Price = as.numeric(rawData$Price)
+
+# Remove Unammed column
+rawData = rawData[,-2]
+
+```
+
+```{r}
+rawData
+```
+
+```{r}
+months = list("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+for (i in seq_len(nrow(rawData))) {
+  rawData$Week[i] = strsplit(rawData$Date[i], " ")[[1]][1]
+  rawData$TimeZone[i] = strsplit(rawData$Date[i], " ")[[1]][6]
+  rawData$Time[i] = substr(rawData$Date[i], start = 18, stop = 22)
+  
+  month = which(months == strsplit(rawData$Date[i], " ")[[1]][2])
+  
+  rawData$Datee[i] = as.Date(paste(strsplit(rawData$Date[i], " ")[[1]][4],month,substr(rawData$Date[i], start = 9, stop = 10), sep = "-"))
+  
+}
+rm(i, month, months)
+gc()
+```
+
+```{r}
+#grep("Apollo 11", rawData$Detail)
+rawData[grep("Apollo 11", rawData$Detail),]
+#sum(na.omit(rawData$Price[1:(grep("Apollo 11", rawData$Detail)-1)]))
+```
+
+```{r}
+#strsplit(rawData$Date[1], " ")[[1]][3]
+#substr(rawData$Date[1], start = 9, stop = 10)
+
+tmp1 = list("Jan", "Feb", "Mar", "Apr", "May", "jun", "Jul", "Aug", "Sept", "oct", "Nov", "Dec")
+tmp2 = which(tmp1 == strsplit(rawData$Date[1], " ")[[1]][2])
+tmp2
+rm(tmp1, tmp2)
+```
+```{r}
+rm(teste)
+gc()
+```
+
+```{r}
+hist(rawData$Price, xlab="Price", main="Histograma dos preços")
+```
+
+```{r}
+mean(na.omit(rawData$Price))
+```
+
+```{python}
+print("ola")
+```
+
+```{node}
+console.log("ola")
+```
+
+```{r}
+# install and load the calibrate package
+install.packages("calibrate")
+library(calibrate)
+```
+```{r}
+install.packages("dplyr")
+library(dplyr)
+```
+
+```{r}
+# Load ggplot2
+#install.packages("ggplot2")
+#library(ggplot2)
+
+#organizationTable = table(rawData$Organisation)
+#names(organizationTable)
+
+#as.numeric(organizationTable)
+
+# convert table to matrix and then to vectors
+#oraganizationsVector = names(organizationTable)
+#oraganizationsVector
+#organizationFrequencyVector = as.numeric(organizationTable)
+#organizationFrequencyVector
+
+#table(rawData$Organisation)
+#pie(organizationFrequencyVector, labels = oraganizationsVector, main = "Gráfico de pizza das organizações", cex = 0.8)
+
+# adjust label positions
+#theta <- 2*pi*(cumsum(organizationFrequencyVector)-organizationFrequencyVector/2)/sum(organizationFrequencyVector)
+#theta[theta > pi] <- theta[theta > pi] - 2*pi
+#text(1.2*cos(theta), 1.2*sin(theta), oraganizationsVector)
+
+pie(table(rawData$Organisation), main = "Gráfico de pizza das organizações", cex = 0.9)
+
+```
+
+```{r}
+"calculo de frequencia de uma variavel quantitativa continua: preço"
+prices = na.omit(rawData$Price)
+A = max(prices) - min(prices)
+k = 5 * log(sum(!is.na(rawData$Price)))
+c = A / k - 1
+
+limiteInferior = min(prices) - c/2
+limiteInferior = as.integer(limiteInferior)
+
+#seq(from = limiteInferior*1.19, to = max(prices), by = c)
+#"a"
+
+cut(seq(from = limiteInferior, to = max(prices), by = c), k)
+
+#ntile(seq(from = limiteInferior, to = max(prices), by = c), 5)
+
+#findInterval(seq(from = limiteInferior, to = max(prices), by = c), k)
+
+#cut(seq(from = limiteInferior, to = max(prices), by = c), k, include.lowest = FALSE)
+
+#sequ = seq(from = limiteInferior, to = max(prices), by = c)
+
+#cut(sequ, breaks = c(limiteInferior, seq(quantile(sequ, 0.001), max(sequ), length.out = 34)), include.lowest = FALSE)
+
+#quantile(limiteInferior, 0.001)
+
+#cut(seq(from = quantile(limiteInferior, 0.001), to = quantile(max(prices), 0.999), by = c), k, include.lowest = TRUE)
+
+#cut(sequ, breaks = seq(quantile(sequ, 0.001), max(sequ), length.out = c), include.lowest = TRUE)
+
+```

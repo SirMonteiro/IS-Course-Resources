@@ -1,0 +1,25 @@
+books/
+*.m4a
+*.mp3
+*.m4v
+*.mp4
+saida.txt
+saida1.txt
+saida2.txt
+textos/
+gabideca/
+.idea/
+.vscode/
+cmake-build-debug/
+
+# From https://github.com/github/gitignore/blob/main/R.gitignore
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+.RDataTmp
+
+# RStudio files
+.Rproj.user/

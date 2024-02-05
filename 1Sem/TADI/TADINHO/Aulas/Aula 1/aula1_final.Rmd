@@ -1,0 +1,284 @@
+# Tadinho Aula 1 - Introduzindo o R
+
+Bem vindo ao R Studio, aqui será o ambiente de desenvolvimento que vamos usar durante o Tadinho.
+
+O R Studio é um pouco poluído, porém em pouco tempo você se acustumará com suas funções e saberá onde tá o que.
+
+O importante de se saber por enquanto é que, a princípio, esse ambiente funcionará como um docs qualquer. Podemos colocar textos, imagens, etc e personalizar. Porém, podemos adicionar blocos de código em R e outras linguagens (vamos usar apenas o R). Exemplo:
+
+Clique no "play" do canto superior direito ou, caso estejamos dentro do bloco de código, usar o atalho Ctrl + Shift + Enter (pode variar).
+
+```{r}
+olaMundo <- "Hello World"
+print(olaMundo)
+```
+
+Ao fazer isso, o código é executado e a saída dele aparece em baixo.
+
+## Sobre o dataset que vamos usar nessa aula
+
+Para mostrar os conceitos iniciais de como usar o R, vamos usar um conjunto de dados (dataset) que possui algumas características de [pokémon](https://www.kaggle.com/datasets/igorcoelho24/pokemon-all-generations). Esses dados estão armazenados num arquivo csv (comma-separated values), que é um arquivo de texto que possui os dados separados por virgulas, bastante comum para armazernar dados.
+
+No dataset escolhido, temos as seguintes colunas:
+
+-   **Name**: nome do pokémon
+
+-   **Pokedex id**: numero do pokémon na pokedex
+
+-   **height**: altura do pokémon
+
+-   **weight**: peso do pokémon
+
+-   **type**: tipo do pokémon
+
+-   **secundary type**: segundo tipo do pokémon, se não há segundo tipo é marcado como "None"
+
+-   **HP**: "hit points" - "vida" do pokémon
+
+-   **Attack**: pontos de ataque físico
+
+-   **Defense**: pontos de resintencia a ataque físico
+
+-   **SP Atk**: pontos de ataque especial
+
+-   **SP Def**: pontos de defesa contra ataques especiais
+
+-   **Speed**: velocidade do pokemon
+
+Tendo uma noção do dataset que vamos usar, vamos começar a usar o R para manipular ele.
+
+## Lendo e visualizando os dados
+
+Primeiro, vamos ler o conjunto de dados.
+
+```{r}
+# Atribui o arquivo csv a variavel "pokemon"
+pokemon <- read.csv('data/Pokemon_full.csv')
+```
+
+Rondando a célula acima, passamos a ter uma variável chamada pokemon que armazena o nosso conjunto de dados. Se você estiver no R Studio, no canto superior direito, na aba environment, aparecerá as variáveis atuais. Ao clicar na variável, abrirá uma nova aba mostrando os dados contidos nela.
+
+Porém, não é nem um pouco prático ficar clicando variável por variável para visualizar nossos dados e muito menos para visualizar com algum filtro. Para isso, podemos utilizar os blocos de código aqui para visualizar e aplicar funções para facilitar a visualização dependendo de nosso objetivo.
+
+Função
+
+:   Basicamente, é um código encapsulado que recebe uma entrada e gera uma saída, de forma que podemos encurtar nosso código reaproveitando o código. Essas funções podem ser criadas por nós (não veremos isso agora), porém também podem vir como padrão em alguma linguagem (o R tem várias como padrão para a área de dados) ou podemos importar uma biblioteca que possua a funções que queremos.
+
+    Para chamar uma função "func" qualquer, que possui o conjunto de entradas "ent", usamos "func(ent)". Exemplo, no R temos como padrão a função "min" que acha o valor mínimo numa lista, se fizermos min(lista) ela retorna o valor mínimo da lista.
+
+```{r}
+#imprime o dataset inteiro
+pokemon
+
+#também pode ser "print(pokemon)" - vale lembrar essa opção, pois será necessária em alguns casos. Porém em geral podemos apenas escrever o nome da variável para imprimi-la no R Studio
+```
+
+```{r}
+#visualiza o dataset inteiro
+#View(pokemon)
+```
+
+```{r}
+#imprime as x primerias linhas (6 primeiras por padrao)
+#head(data, "quantidade de linhas que queremos imprimir")
+head(pokemon)
+```
+
+```{r}
+#imprime as 3 primeiras linhas
+head(pokemon, 3)
+```
+
+```{r}
+#imprime as x ultimas linhas (6 ultimas por padrao)
+#tail(data, "quantidade de linhas que queremos imprimir")
+tail(pokemon)
+```
+
+```{r}
+#imprime as 3 primeiras linhas 
+tail(pokemon, 3)
+```
+
+Acima, visualizamos o conjunto inteiro, porém podemos escolher alguma coluna ao invés de escolher o dataset inteiro selecionando ao final da variável com um colchete. Também pode usar o operador \$, mas ele muda o tipo da variável.
+
+Tipo de variável
+
+:   Quando atribuimos um valor a uma variável, como em:
+
+    ``` r
+    pokemon <- read.csv('data/Pokemon_full.csv')
+    ```
+
+    essa variável passa a ter um tipo. Esse tipo é definido automáticamente pelo R, mas podemos ver-lo com a função class(). Esse tipo vai definir o que podemos fazer com essa variável e o que ela representa.
+
+```{r}
+#só o nome
+pokemon["name"]
+```
+
+```{r}
+#somente o nome e o tipo
+pokemon[c('name','type')]
+# o c() é a combinacao dos valores
+```
+
+```{r}
+#os nomes dos 9 primeiros 
+head(pokemon["name"], 9)
+```
+
+Também podemos selecionar as linhas que queremos ver. Ao fazer "pokemon['linha', 'coluna']" podemos selecionar o que queremos ver.
+
+```{r}
+#visualizar a primeira linha (id == 1)
+pokemon[1,]
+```
+
+```{r}
+#visualizar a primeira coluna
+pokemon[,1]
+```
+
+```{r}
+#visualizar a o que está na primeira coluna e na primeira linha
+pokemon[1,1]
+```
+
+## Medidas
+
+Vamos nessa parte usar funções para tirar algumas medidas de nosso dados.
+
+Vamos pegar a coluna peso e tirar algumas medidas dos dados nela contido:
+
+```{r}
+#atribui os pesos numa nova variavel
+#motivo: facilitar a criação do código e deixar mais limpo
+pesos <- pokemon$weight
+```
+
+```{r}
+pokemon
+```
+
+```{r}
+pesos
+```
+
+```{r}
+#media
+mean(pesos)
+```
+
+```{r}
+median(pesos)
+```
+
+```{r}
+#maximo
+max(pesos)
+```
+
+```{r}
+#pesos[max(pesos)]
+#dim(pokemon)
+#which.max(pesos)
+pokemon[which.max(pesos),]
+```
+
+```{r}
+#minimo
+min(pesos)
+```
+
+Vemos que a média e a mediana são são bem distantes. Vamos plotar um histograma para ver como é a distribuição dos pesos.
+
+```{r}
+#imprime o histograma
+hist(pesos)
+```
+
+```{r}
+points(plot(pesos))
+```
+
+Vemos que existe uma maior frequência de indivíduos nas primeiras no início, mas vai decaindo a ponto de ficar praticamente invisível no gráfico.
+
+Isso significa que, por mais que temos muitos outliers de pokemon mais pesados.
+
+Outra forma de tirar medidas básicas é através da função summary(), que nos trás de uma vez algumas informações.
+
+```{r}
+#summary dos pesos
+summary(pesos)
+```
+
+Podemos usar para variáveis categóricas também:
+
+```{r}
+summary(pokemon$type)
+```
+
+Podemos usar para o dataframe inteiro, mas fica bagunçado e difícil de visualizar.
+
+```{r}
+summary(pokemon)
+```
+
+Algumas noções básicas de programação que podem auxiliar na aprendizagem do R
+
+```{r}
+# Operadores lógicos & variáveis booleanas
+
+# as variáveis booleanas determinam se algo é falso ou verdadeiro
+
+# vamos testar os operadores lógicos:
+10 > 100
+
+5 >= 5
+
+100 > 10
+
+10 != 7
+
+7 == 7
+
+7 != 6
+
+# o operador "&&" determina que as duas condições tem que ser verdadeiras para que a expressão seja considerada verdadeira
+(7 == 7 && 5==5)
+(7 == 7 && 5!=5)
+
+# o valor booleano pode ser armazenado em uma variável e posteriormente "printado"
+
+# "==" é um operador lógico que realiza a comparação de igualdade
+variavelTeste <- 5 == 5  
+print(variavelTeste)
+
+variavelTeste2 <- 6 == 5 # (claramente falso)
+print(variavelTeste2)
+
+# ("!=" quer dizer diferente, o operador lógico realiza a comparação de diferença)
+variavelTeste3 <- 6 != 5
+print(variavelTeste3)
+
+
+# para verificar o tipo de uma variavel no R, basta utilizar a função typeof()
+typeof(variavelTeste)
+
+# a variavel abaixo é uma variavel do tipo "character"
+variavelString = "monitoria de tadi"
+typeof(variavelString)
+
+typeof(5) # double
+
+typeof("TADI") # character
+
+
+```
+
+
+
+```{r}
+
+```

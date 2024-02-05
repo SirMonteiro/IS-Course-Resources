@@ -1,0 +1,9 @@
+Os exercícios estão corretos com notação correta
+
+A derivada parcial em relação a x da função no item c pode ser simplificada, pois ela foi aberta no começo da resolução.
+
+No 2 letra "a", como eles são múltiplos escalares, então eles são linearmente dependentes.
+
+No 2 letra "b", indique de onde vem a afirmação, nesse caso de um teorema.
+
+No 3, ambas as respostas indicam que são uma base, porém, no "a", como a quantidade de vetores é maior que o espaço, então são linearmente dependentes e, portanto, não são uma base nesse caso, e no "b', os vetores apresentados não são os mais básicos do subespaço, então também não são uma base.

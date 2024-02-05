@@ -1,0 +1,399 @@
+---
+title: "work"
+output:
+  pdf_document: default
+  html_document: default
+date: "2023-05-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Read raw data
+rawData = read.csv("data/mission_launches.csv")
+
+# Convert price column to numeric
+rawData$Price = as.numeric(rawData$Price)
+
+# Remove Unammed column
+rawData = rawData[,-2]
+
+```
+
+```{r}
+rawData
+```
+
+```{r}
+months = list("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+for (i in seq_len(nrow(rawData))) {
+  rawData$Week[i] = strsplit(rawData$Date[i], " ")[[1]][1]
+  rawData$TimeZone[i] = strsplit(rawData$Date[i], " ")[[1]][6]
+  rawData$Time[i] = substr(rawData$Date[i], start = 18, stop = 22)
+  
+  month = which(months == strsplit(rawData$Date[i], " ")[[1]][2])
+  
+  rawData$Datee[i] = paste(strsplit(rawData$Date[i], " ")[[1]][4],month,substr(rawData$Date[i], start = 9, stop = 10), sep = "-")
+  
+}
+rm(i, month, months)
+gc()
+```
+
+```{r}
+hist(rawData$Price, xlab="Preço (em milhões de dólares)", ylab="Quantidade", main="Histograma dos preços")
+```
+
+```{r}
+pie(table(rawData$Organisation), main = "Gráfico de pizza das organizações", cex = 0.9, init.angle = 90)
+```
+
+```{r}
+"Média de preços em milhões dos foguetes projetados"
+prices = na.omit(rawData$Price)
+
+mean(prices)
+median(prices)
+Mode(prices)
+
+"Variancia"
+var(prices)
+"Desvio padrão"
+sd(prices)
+
+cv = sd(prices)/mean(prices)*100
+cv
+```
+
+```{r}
+"Mediana de foguetes com tentativas de lançamento"
+"ou seja, metade dos foguetes foram lançados antes dessa data e metade após"
+median(as.Date(rawData$Datee))
+```
+
+```{r}
+# Define the Mode() function
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+Mode(rawData$Organisation)
+
+```
+
+```{r}
+min(na.omit(rawData$Price))
+
+max(na.omit(rawData$Price))
+```
+
+```{r}
+sum(!is.na(rawData$Price))
+```
+
+```{r}
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+"calculo de frequencia de uma variavel quantitativa continua: preço"
+prices = na.omit(rawData$Price)
+A = max(prices) - min(prices)
+k = 5 * log(sum(!is.na(rawData$Price)))
+c = A / k - 1
+
+c = round(c)
+
+limiteInferior = min(prices) - c/2
+limiteInferior = as.integer(limiteInferior)
+
+#"Classes":
+classesCut = cut(seq(from = limiteInferior, to = max(prices) + 6, by = c), k, right = FALSE)
+classesCut
+
+"Frequência absoluta"
+# Generate a sequence of intervals
+intervals <- seq(limiteInferior, max(prices) + 6, by = c)
+
+# Assign each data point to a specific interval
+data_intervals <- cut(prices, breaks = intervals, right = FALSE)
+
+# Calculate the frequency of data in each interval
+freq <- table(data_intervals)
+sum(as.numeric(freq))
+kable(freq, format = "html",
+  table.attr = 'style="background: #fff"',)
+
+"Frequência relativa"
+fr=freq/sum(as.numeric(freq))
+#kable(fr, format = "html", table.attr = 'style="background: #fff"')
+kable(round(fr, 3), format = "html", table.attr = 'style="background: #fff"')
+sum(as.numeric(round(fr, 3)))
+
+"Frequência Acumulada"
+fAcumulada = cumsum(freq)
+kable(fAcumulada, format = "html", table.attr = 'style="background: #fff"')
+
+"Frequência Acumulada relativa"
+fAcuRel = fAcumulada/sum(as.numeric(freq))
+kable(round(fAcuRel, 3), format = "html", table.attr = 'style="background: #fff"')
+
+#hist(prices, breaks = seq(from = limiteInferior, to = max(prices) + 6, by = c), xlab = "Values", ylab = "Frequency", right = FALSE)
+#seq(from = limiteInferior, to = max(prices) + 6, by = c)
+
+# Create the histogram with ggplot2
+ggplot(data.frame(x = prices), aes(x)) +
+  geom_histogram(binwidth = c, boundary = 0,
+                 fill = "#00A1C0", col = "white") +
+  scale_x_continuous(breaks = round(seq(from = limiteInferior, to = max(prices) + 6, by = c))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Histograma da frequência absoluta de investimentos",
+       x = "Classes",
+       y = "Frequência") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 18),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 5.5))
+```
+
+```{r}
+
+# Create the histogram with ggplot2
+histogramaFreqInvestimentos = ggplot(data.frame(x = prices), aes(x)) +
+  geom_histogram(binwidth = c, boundary = 0,
+                 fill = "#00A1C0", col = "black") +
+  scale_x_continuous(breaks = round(seq(from = limiteInferior, to = max(prices) + 6, by = c))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Histograma da frequência absoluta de investimentos",
+       x = "Investimento (em milhões de dólares)",
+       y = "Frequência absoluta") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 5.5))
+histogramaFreqInvestimentos
+#ggsave("histogramaFreqInvestimentos.png", histogramaFreqInvestimentos, device="png")
+
+# Create the histogram with ggplot2
+poligonoFreqInvestimentos = ggplot(data.frame(x = prices), aes(x)) +
+  #geom_histogram(binwidth = c, boundary = 0, fill = "#00A1C0", col = "black") +
+  #geom_line() +
+  #geom_point(data = data.frame(x = prices, "."), aes(x,y = as.numeric(freq)), color = "red") +
+    #stat_bin(binwidth = c, geom = "text", aes(label = round(..count.., 2), y = ..count.. + 10)) +
+  #stat_bin(binwidth = c, geom = "point", aes(label = round(..count.., ), y = ..count.. + 10)) +
+  #geom_point(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "red")
+  scale_x_continuous(breaks = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Polígono da frequência absoluta de investimentos",
+       x = "Ponto médio das classes",
+       y = "Frequência absoluta") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 5.5)) +
+    geom_point(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0") +
+    geom_line(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0")
+
+poligonoFreqInvestimentos
+ggsave("poligonoFreqInvestimentos.png", poligonoFreqInvestimentos, device="png")
+
+# Create the histogram with ggplot2
+ggplot(data.frame(x = prices), aes(x)) +
+  geom_histogram(binwidth = c, boundary = 0, fill = "#00A1C0", col = "black") +
+  scale_x_continuous(breaks = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Polígono da frequência absoluta de investimentos",
+       x = "Ponto médio das classes",
+       y = "Frequência absoluta") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 5.5)) +
+    geom_point(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0") #+
+    #geom_line(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0")
+```
+
+```{r}
+ggplot(data.frame(x = prices), aes(x)) +
+  geom_histogram(binwidth = c, boundary = 0, fill = "#00A1C0", col = "black") +
+  scale_x_continuous(breaks = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Polígono da frequência absoluta de investimentos",
+       x = "Ponto médio das classes",
+       y = "Frequência absoluta") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 5.5)) +
+    geom_point(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0") #+
+    #geom_line(data = data.frame(x = round(seq(from = limiteInferior + c/2, to = max(prices) + 6, by = c)), y = as.numeric(freq)), aes(x,y), color = "#00A1C0")
+```
+
+```{r}
+rawData %>% 
+  ggplot(aes(x = Price)) + 
+  geom_histogram(bins = round(k), col="black") + 
+  scale_x_continuous(breaks = seq(from = limiteInferior, to = max(na.omit(rawData$Price)) + 6, by = c)) + 
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 10),
+        axis.text = element_text(size = 5.5))
+```
+
+```{r}
+# criar um vetor de preços de ações fictícios
+set.seed(123)
+prices <- rnorm(1000, mean = 50, sd = 10)
+
+# determinar os limites dos intervalos
+limiteInferior <- floor(min(prices))
+limiteSuperior <- ceiling(max(prices))
+amplitude <- 2
+c <- seq(limiteInferior, limiteSuperior, by = amplitude)
+
+# criar um data frame com os pontos médios dos topos dos retângulos
+library(dplyr)
+df <- data.frame(prices = prices) %>% 
+  mutate(intervals = cut(prices, breaks = c, include.lowest = TRUE)) %>% 
+  group_by(intervals) %>% 
+  summarise(midpoint = (last(intervals) + first(intervals))/2, 
+            count = n())
+
+# criar o histograma com o ggplot
+library(ggplot2)
+ggplot(data.frame(x = prices), aes(x)) +
+  geom_histogram(binwidth = amplitude, boundary = limiteInferior,
+                 fill = "#00A1C0", col = "white") +
+  geom_point(data = df, aes(x = midpoint, y = count), col = "red") +
+  scale_x_continuous(breaks = round(seq(from = limiteInferior, to = limiteSuperior, by = amplitude))) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Histograma da frequência absoluta de investimentos",
+       x = "Classes",
+       y = "Frequência") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 18),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12))
+
+
+```
+
+```{r}
+c
+A
+k
+```
+
+```{r}
+tabelaGeral = cbind(freq, round(fr, 3), fAcumulada, round(fAcuRel, 3))
+write.csv(tabelaGeral, file = "temp.csv", row.names = FALSE)
+```
+
+```{r}
+library(dplyr)
+
+#order(rank(prices, ties.method = "min"))
+
+df = data.frame(organization = rawData$Organisation, price = rawData$Price)
+
+rank_table <- df %>% 
+  group_by(organization) %>% 
+  summarize(total = sum(price), quantity = length(price)) %>% 
+  arrange(desc(total)) %>% 
+  mutate(rank = rank(desc(total)))
+
+rank_table
+```
+
+```{r}
+# Group data by label and calculate sum of prices for each group
+df_sum <- rawData %>% 
+  group_by(Organisation) %>% 
+  summarise(sum_price = sum(na.omit(Price))) #%>%
+#  arrange(desc(sum_price))
+
+# Assign rank to each group based on sum of prices
+#df_sum$rank <- rank(-df_sum$sum_price)  # Negative sign to rank in descending order
+
+# View final table
+df_sum
+```
+
+```{r}
+rank_table <- rawData %>% 
+  group_by(Organisation) %>% 
+  summarize(total = sum(na.omit(Price)), quantity = length(na.omit(Price))) %>% 
+  subset(total != 0) %>%
+  arrange(desc(total)) %>% 
+  mutate(rank = as.integer(rank(desc(total))))
+
+rank_table
+```
+
+```{r}
+
+status = rbind(table(rawData$Mission_Status), table(sum(table(rawData$Mission_Status))))
+# status = table(rawData$Mission_Status)
+# aggregate(Mission_Status ~ sum(table(Mission_Status)), data = rawData, sum)
+
+df_sum <- rawData %>% 
+  group_by(Mission_Status) %>% 
+  summarise(sum_value_col = sum(table(Mission_Status)))
+
+df_sum
+
+kable(status, format = "html", table.attr = 'style="background: #fff"')
+
+#    pie(table(rawData$Mission_Status), main = "Gráfico de pizza da taxa de sucesso", cex = 1)
+
+
+# pie(table(rawData$Mission_Status) , labels = c("Gr-A","Gr-B","Gr-C","Gr-D","Gr-E"), border="white", col="black" )
+# rawData %>% 
+#   ggplot(aes(x = Mission_Status)) + 
+#   geom_bar() +
+#   coord_polar("x", start=0)
+
+# ggplot(rawData, aes(x="", y=Mission_Status, fill=Mission_Status)) +
+#   geom_bar(stat="identity", width=1) +
+#   coord_polar("y", start=0)+
+# theme_void() + 
+#   theme(legend.position="none") +
+#   
+#   geom_text(aes(y = ypos, label = c("a", "b", "c")), color = "white", size=6) +
+#   scale_fill_brewer(palette="Set1")
+```
+
+```{r}
+
+#png("pizzaTaxaSucesso.png")
+pie(table(rawData$Mission_Status), main = "Gráfico de pizza da taxa de sucesso", cex = 1, labels= c("Falha", "Falha parcial", "Falha no pré lançamento", "Sucesso"), col = c("red", "orange", "yellow", "green"))
+#dev.off()
+
+histogramaTaxaSucesso = ggplot(data.frame(x = rawData$Mission_Status), aes(x)) +
+geom_histogram(stat = "count", fill = c("red", "orange", "yellow", "green")) + 
+scale_x_discrete(labels=c("Falha", "Falha parcial", "Falha no pré lançamento", "Sucesso")) +
+labs(title = "Histograma da taxa de sucesso",
+     x = "Status da missão",
+     y = "Frequência absoluta") +
+theme_bw() +
+theme(plot.title = element_text(size = 12),
+      axis.title = element_text(size = 12),
+      axis.text = element_text(size = 12),
+      legend.position = "none")
+histogramaTaxaSucesso
+#ggsave("histogramaTaxaSucesso.png", histogramaTaxaSucesso, device="png")
+# Create pie chart with colors and labels
+# ggplot(rawData, aes(x = "", y = Mission_Status, fill = Mission_Status)) +
+#   geom_bar(stat = "identity", width = 1) +
+#   coord_polar("y", start = 0) +
+#   scale_fill_manual(values = c("red", "blue", "green", "orange", "purple")) +
+#   theme_void() +
+#   geom_text(aes(label = paste0(Mission_Status, ": ", Mission_Status)), position = position_stack(vjust = 0.5))
+
+```
+
+```{r}
+sd(na.omit(rawData$Price))
+```
+

@@ -77,7 +77,7 @@ Course informations source: https://uspdigital.usp.br/jupiterweb/listarGradeCurr
 ### 2nd Semester
 
 - [ACH2002]: [Introdução à Análise de Algoritmos (IAA)](2Sem/IAA) ✅
-- [ACH2012]: [Cálculo II (CALC II)](2Sem/CALC2) ⚠️
+- [ACH2012]: [Cálculo II (CALC II)](2Sem/CALC2) ✅
 - [ACH2013]: [Matemática Discreta (MD)](2Sem/MD) ✅
 - [ACH2023]: [Algoritmos e Estruturas de Dados I (AED I)](2Sem/AED) ✅
 - [ACH2033]: [Matrizes, Vetores e Geometria Analítica (MVGA)](2Sem/MVGA) ✅

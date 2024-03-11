@@ -1,19 +1,18 @@
 #include <stdio.h>
 
-#include "grafoMatrizadj.c"
+#include "grafoMatrizadj.h"
 
 int main() {
-    printf("Hello, World!\n");
     Grafo g1;
     int numVertices;
-
-//    inicializaGrafo(&g1, 10);
 
     do {
         printf("Digite o n de vertices do grafo\n");
         scanf("%d", &numVertices);
     } while (!inicializaGrafo(&g1, numVertices));
 
-    // imprimeGrafo(&g1);
+    insereAresta(&g1, 0, 1, 10);
+    insereArestaNaoDirecionado(&g1, 1, 2, 20);
+    imprimeGrafo(&g1);
     return 0;
 }

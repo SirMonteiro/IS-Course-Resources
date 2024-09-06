@@ -86,11 +86,11 @@ Course informations source: https://uspdigital.usp.br/jupiterweb/listarGradeCurr
 
 ### 3rd Semester
 
-- [ACH2003]: [Computação Orientada a Objetos (COO)](3Sem/COO)
-- [ACH2024]: [Algoritmos e Estruturas de Dados II (AED II)](3Sem/AED2)
-- [ACH2034]: [Organização e Arquitetura de Computadores (OAC I)](3Sem/OAC1)
-- [ACH2063]: [Introdução à Administração e Economia para Computação (IAEC)](3Sem/IAEC)
-- [ACH2053]: [Introdução à Estatística (IE)](3Sem/IE)
+- [ACH2003]: [Computação Orientada a Objetos (COO)](3Sem/COO) ✅
+- [ACH2024]: [Algoritmos e Estruturas de Dados II (AED II)](3Sem/AED2) ✅
+- [ACH2034]: [Organização e Arquitetura de Computadores (OAC I)](3Sem/OAC1) ✅
+- [ACH2063]: [Introdução à Administração e Economia para Computação (IAEC)](3Sem/IAEC) ✅
+- [ACH2053]: [Introdução à Estatística (IE)](3Sem/IE) ✅
 
 ### 4th Semester
 

@@ -1,0 +1,98 @@
+/* ESTRUTURASdeDADOS/estruturas-de-dados/style-mobile.css */
+HTML {
+  font-size: 16px;
+}
+body { 
+  margin-left: 1.5%;
+  margin-right: 1%;
+  margin-right: 2%;
+  hyphens: auto;
+}
+div.narrowpage {
+  margin-left: 0%;
+  margin-right: 0%;
+  margin-bottom: 3em;
+}
+tt {
+/* font-size: 0.825em; a little too much...*/
+}
+ul {
+  margin-left: -0.6em;
+}
+ul ol {
+  margin-left: -0.6em;
+}
+ul ul {
+  margin-left: -0.6em;
+}
+ol {
+  margin-left: -0.6em;
+}
+pre { /*does not work...*/
+  margin-left: 0em;
+}
+pre.displaysmall {
+  margin-left: 1em;
+}
+pre.sp {
+  margin-left: 1em;
+}
+pre.code {
+  margin-left: 0.5em;
+}
+pre.fcode {
+  margin-left: 0.5em;
+  margin-right: 0em;
+}
+pre.io {
+  margin-left: 0.5em;
+  margin-right: 0.0em;
+}
+table.api {
+  margin: 1.0em 0em 1.5em 1em;
+}
+table.api td.tt1 {
+  font-size: 0.75em;
+}
+table.api td.tt2 { 
+  font-size: 0.75em;
+}
+table.api td.bla {
+}
+table.api td.blb {
+}
+table.api td.bla tt {
+  font-size: 0.75rem;
+}
+table.api td.blb tt {
+  font-size: 0.75rem;
+}
+table.c { /*all centered*/
+  margin-left: 0.2em;
+}
+/* illustration in index.html */
+table.illustration {
+/*float: right;*/
+  width: 15em;
+  margin: 0em -2.5em 1em 1em;
+  border: 0px solid black; /*scaffold*/
+  display: none; /*invisible!*/
+}
+img.wordle {
+  vertical-align: top;
+  opacity: 0.50;
+/*filter: alpha(opacity=50);*/ /* For IE8 and earlier */
+  height: 75px;
+  border: 0px solid black;
+}
+table.dictionary {
+}
+table.dictionary td {
+  margin: 0em 0.0em 0.0em 0em;
+  padding: 0em 1em 0.0em 0em;
+  white-space: normal;
+  vertical-align: middle;
+}
+img.r {
+  height: 18px;
+}

@@ -1,0 +1,52 @@
+EP1 POO - PONG!
+Gabriel Monteiro de Souza - 14746450
+
+ACH2003 - EACH-USP - Prof.Dr. Daniel de Angelis Cordeiro
+31/05/2024
+
+Para a execução prevista use o Java entre 8 e 21.
+O código foi produzido com base no Java 17.
+
+# Instruções para executar
+
+Para fácil compilação e execução, basta ter o GNU Make instalado e rodar dentro de "./src" o comando "make".
+
+# Comandos individuais
+
+## Compilação
+
+Para compilar rode "make build".
+Esse comando irá compilar usando o JDK padrão os arquivos "Ball.java Player.java Score.java".
+
+## Execução
+
+Para apenas executar rode "make run".
+Esse comando irá executar o JRE padrão com uma flag forçando a utilização do OpenGL na classe Pong onde contém o Main do jogo.
+
+Caso o jogo não rode como esperado na sua plataforma, tente rodar "make runSafe" para executar o jogo com o safe mode ativo.
+
+## Limpeza
+
+Para remover os arquivos gerados na compilação execute "make clean".
+
+# Implementações após o funcionamento pleno
+
+## Pong original
+
+Inspirado no Pong original do Atari, foi implementado um pontilhado no meio da tela.
+A cada ponto marcado, a bola sai de um lugar aleatório dentro do pontilhado.
+
+## Velocidade
+
+Para criar uma maior dificuldade no jogo, foi implementado uma variação de velocidade durante a gameplay.
+Assim, foi considerado que a velocidade inserida para a API da bola é considerada máxima, dessa forma, a velocidade é reduzida para o início do game sendo progressivamente aumentada até a velocidade dada.
+
+Quando há uma colisão entre a bola e o jogador, a velocidade é aumentada em 0.001 px/ms.
+
+Quando é marcado um ponto a velocidade é aumentada em 0.01 px/ms.
+
+## Modo especial
+
+Essa modificação do jogo contém um modo "secreto" que deixa a bola andando com uma certa aleatoriedade, dessa forma é proposital que nesse modo a bola possa atravessar os limites do mapa. Assim, esse modo é recomendado para uma jogatina mais casual.
+
+Esse modo pode ser ativado segurando as setas cima e baixo ao mesmo tempo, e desativado segurando as setas esquerda e direita ao mesmo tempo.

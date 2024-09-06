@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/home/gabriel/USP/IS/3Sem/OAC1/EP1/build",
+  "command": "/usr/bin/gcc -g -std=gnu99 -o CMakeFiles/EP1.dir/EP1.c.o -c /home/gabriel/USP/IS/3Sem/OAC1/EP1/EP1.c",
+  "file": "/home/gabriel/USP/IS/3Sem/OAC1/EP1/EP1.c",
+  "output": "CMakeFiles/EP1.dir/EP1.c.o"
+},
+{
+  "directory": "/home/gabriel/USP/IS/3Sem/OAC1/EP1/build",
+  "command": "/usr/bin/gcc -g -std=gnu99 -o CMakeFiles/EP1.dir/driverEP1.c.o -c /home/gabriel/USP/IS/3Sem/OAC1/EP1/driverEP1.c",
+  "file": "/home/gabriel/USP/IS/3Sem/OAC1/EP1/driverEP1.c",
+  "output": "CMakeFiles/EP1.dir/driverEP1.c.o"
+}
+]

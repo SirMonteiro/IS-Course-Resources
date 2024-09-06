@@ -1,0 +1,21 @@
+i 1
+i 2
+i 3
+i 4
+i 5
+i 6
+i 7
+i 8
+i 9
+i 10
+i 11
+i 12
+i 13
+i 14
+i 15
+p
+
+
+for this test trying to remove more complex ones, like 7 let me to segmentation fault, i need to fix that.
+Probably i will change all merge part, at same time that i don´t want to get a diff when testing with official tests!
+fix that tomorrow 25/06/24!

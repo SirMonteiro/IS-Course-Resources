@@ -1,0 +1,53 @@
+16*1024*1024 bytes mem 16777216
+
+16*1024 linhas - 4 palavras 1 byte = 4bytes
+
+1 linha - 16*1024 * 4 bytes 65536
+
+
+
+16777216/65536 = 256
+
+
+256 bytes de memoria por linha
+
+1455004-1441792 = 13212
+
+
+i=j%16384
+
+
+0,1,2,3
+1441792,1441793,1441794,1441795
+1441796,1441797,1441798,1441799
+1455004,1455005,1455006,1455007
+
+0x000000, 0x000001, 0x000002, 0x000003
+0x160000, 0x160001, 0x160002, 0x160003
+0x160004, 0x160005, 0x160006, 0x160007
+0x16339C, 0x16339D, 0x16339E, 0x16339F
+0x16FFFC, 0x16FFFD, 0x16FFFE, 0x16FFFF
+0xFFFFF8, 0xFFFFF9, 0xFFFFFA, 0xFFFFFB
+0xFFFFFC, 0xFFFFFD, 0xFFFFFE, 0xFFFFFF
+
+
+RAM tem 16Mb, cada bloco tem 4kb
+cada endereçamento 1kb
+
+r = 14
+m = 16384
+
+8 = s - 14
+s = 22
+
+24 = 22 + w
+w = 2
+
+
+v = 4096 blocos
+
+
+import math;(math.floor(1455004/4))%(16*1024)
+
+hex((int((0x320000)/4))%(16*1024))
+hex((int((0x320000)/4))%(8192))

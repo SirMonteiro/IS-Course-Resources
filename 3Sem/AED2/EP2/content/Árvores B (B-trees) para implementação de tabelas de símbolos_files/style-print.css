@@ -1,0 +1,17 @@
+/* ESTRUTURASdeDADOS/estruturas-de-dados/style-print.css */
+body { 
+  margin-left: 2%;
+  margin-right: 0%;
+  font-size: 92%;
+}
+div.narrowpage {
+  margin-left: 1%;
+  margin-right: 1%;
+  margin-bottom: 3em;
+}
+a:link {
+  text-decoration: underline;
+} 
+.dim a:link {
+  text-decoration: underline;
+} 

@@ -1,0 +1,3 @@
+/home/gabriel/USP/IS/3Sem/OAC1/EP1/build/CMakeFiles/EP1.dir
+/home/gabriel/USP/IS/3Sem/OAC1/EP1/build/CMakeFiles/edit_cache.dir
+/home/gabriel/USP/IS/3Sem/OAC1/EP1/build/CMakeFiles/rebuild_cache.dir

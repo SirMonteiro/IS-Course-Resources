@@ -8,6 +8,8 @@
 #define VERTICE_INVALIDO (-1)
 
 typedef int Peso;
+typedef int Apontador;
+
 typedef struct {
     Peso mat[MAXNUMVERTICES][MAXNUMVERTICES];
     int numVertices;
@@ -15,13 +17,20 @@ typedef struct {
 } Grafo;
 
 bool inicializaGrafo(Grafo* grafo, int nv);
-void imprimeGrafo(Grafo* grafo);
-bool insereAresta(Grafo * grafo, int v1, int v2, Peso peso);
+int obtemNrVertices(Grafo* grafo);
+int obtemNrArestas(Grafo* grafo);
+bool verificaValidadeVertice(Grafo *grafo, int v);
+bool insereAresta(Grafo *grafo, int v1, int v2, Peso peso);
 bool insereArestaNaoDirecionado(Grafo *grafo, int v1, int v2, Peso peso);
 bool existeAresta(Grafo *grafo, int v1, int v2);
+Peso obtemPesoAresta(Grafo *grafo, int v1, int v2);
 bool removeAresta(Grafo *grafo, int v1, int v2, Peso *peso);
 bool removeArestaNaoDirecionado(Grafo *grafo, int v1, int v2, Peso *peso);
 bool listaAdjVazia(Grafo *grafo, int v);
-int proxListaAdj(Grafo *grafo, int v, int atual);
+Apontador primeiroListaAdj(Grafo *grafo, int v);
+Apontador proxListaAdj(Grafo *grafo, int v, Apontador atual);
+int obtemVerticeDestino(Grafo *grafo, Apontador p);
+void imprimeGrafo(Grafo* grafo);
+void liberaGrafo(Grafo* grafo);
 
 #endif //AED2_GRAFOMATRIZADJ_H

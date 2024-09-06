@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="pt" data-lt-installed="true"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async="" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/google-analytics_analytics.js"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R5G0LPKDR6');
+</script>
+<meta charset="utf-8">
+<title>Árvores B (B-trees) para implementação de tabelas de símbolos</title>
+<meta name="author" content="Paulo Feofiloff">
+<meta name="keywords" content="estruturas de dados, ciência da computação">
+<link rel="canonical" href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/B-trees.html">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/style.css">
+<link rel="stylesheet" media="screen and (max-width:800px)" href="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/style-mobile.css" type="text/css">
+<link rel="stylesheet" media="print" href="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/style-print.css" type="text/css">
+</head>
+<body class="vsc-initialized">
+
+
+
+
+ 
+
+<p class="menu">
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/index.html">Estruturas de Dados</a> | 
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/index.html">Aulas</a> |
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/dictionary.html">Dicionário</a> |
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/resources.html">Bibliografia</a>
+
+
+
+
+
+
+
+</p><div class="narrowpage">
+<h1>Árvores B (B-trees)</h1>
+
+<p><a href="https://www.ime.usp.br/~pf/estruturas-de-dados/resources.html#algs4">Livro de Sedgewick e Wayne</a>: seção 6.2 (<em>B-trees</em>), cap.6, 
+p.866-874.&nbsp;
+Website do livro:
+
+resumo da sec.6.2 (ainda não está pronto),
+<a href="https://algs4.cs.princeton.edu/lectures/keynote/33BalancedSearchTrees.pdf">slides</a>.&nbsp;
+O&nbsp;código <tt>BTree.java</tt> no website 
+<a href="https://algs4.cs.princeton.edu/code/">algs4.cs.​princeton.edu/​code/</a>
+é diferente do código <tt>BTreeSET.java</tt> 
+no livro impresso.
+
+
+
+
+
+
+</p><p>Árvores&nbsp;B são estruturas usada para implementar 
+TSs (tabelas de símbolos) muito grandes.
+Uma árvore&nbsp;B pode ser vista como um índice
+(análogo ao índice de um livro)
+para uma coleção de pequenas&nbsp;TSs:&nbsp;
+o índice diz em qual das pequenas TSs está a chave que você procura.
+Pode-se dizer que 
+uma árvore&nbsp;B é uma TS de&nbsp;TSs.
+
+
+  
+
+
+
+
+
+</p><div class="small">
+<p class="tinybottom">Resumo:
+</p><ul class="notop">
+<li>
+memória rápida e memória lenta (HDD ou SSD) do computador
+</li><li>
+páginas e a classe <tt>Page</tt>
+</li><li>
+páginas externas e páginas internas
+</li><li>
+busca e inserção
+</li><li>
+a classe <tt>BTreeSET</tt>
+</li></ul>
+
+<p class="tinybottom">Pré-requisitos:
+</p><ul class="notop">
+<li>
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st.html">tabelas de símbolos</a>
+</li><li>
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-twothree.html">árvores&nbsp;2-3</a>
+</li></ul>
+</div>
+
+
+
+
+
+
+
+
+
+<h2 class="aula">Introdução</h2>
+
+<ul>
+
+<li class="item">
+A discussão a seguir menciona, ocasionamente,
+os dois tipos de memória de um computador típico:&nbsp;
+a&nbsp;memória interna (ou principal)
+e a memória externa (ou secundária, usualmente um disco rígido 
+ou memória de estado sólido).&nbsp;
+A&nbsp;memória interna tem alta velocidade
+mas pouca capacidade
+enquanto a memória externa tem
+baixa velocidade mas grande capacidade.&nbsp;
+Vamos nos referir à primeira como <em>memória rápida</em>
+e à segunda como <em>memória lenta</em>.&nbsp;
+Suporemos que o tempo de acesso à memória rápida
+é desprezível quando comparada com o tempo de acesso à memória lenta.
+
+
+
+</li><li class="item">
+Suponha dada uma tabela de símbolos 
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-bin-search.html#comparable">ordenada</a>&nbsp;<var>T</var>.
+Imagine que <var>T</var> tem um número enorme de chaves,
+tão grande que não cabe na memória rápida do computador.
+Para manipular essa tabela de símbolos,
+é preciso dividí-la em segmentos 
+<var>T</var><sub>1</sub>, 
+<span class="nw"><var>T</var><sub>2</sub>, … </span>,
+<span class="nw"><var>T</var><sub><var>n</var></sub></span>,
+cada segmento sendo uma tabela de símbolos
+pequena o suficiente para caber com folga na memória rápida.
+É&nbsp;natural definir os segmentos de modo que 
+todas as chaves em um segmento sejam menores que todas
+as chaves no segmento seguinte.
+
+
+</li><li class="item">
+Para procurar uma chave nessa tabela de símbolos fracionada
+precisamos de um <q>índice</q>,
+ou seja,
+uma tabela de símbolos auxiliar que indique em qual dos segmentos 
+<var>T</var><sub>1</sub>, 
+<span class="nw"><var>T</var><sub>2</sub>, … </span>,
+<var>T</var><sub><var>n</var></sub>
+está a chave procurada.
+Diremos que a tabela de símbolos auxiliar é <em>interna</em>
+e as tabelas de símbolos <span class="nw"><var>T</var><sub>1</sub> </span>, 
+<span class="nw"><var>T</var><sub>2</sub>, … </span>,
+<var>T</var><sub><var>n</var></sub>
+são <em>externas</em>.
+
+</li><li class="item">
+A tabela de símbolos interna, digamos <var>A</var>,
+é organizada da seguinte maneira.
+As chaves de <var>A</var> são 
+<var>k</var><sub>1</sub>, 
+<span class="nw"><var>k</var><sub>2</sub>, … </span>,
+<span class="nw"><var>k</var><sub><var>n</var></sub>,</span>
+sendo 
+<var>k</var><sub><var>i</var></sub>
+a menor chave de <span class="nw"><var>T</var><sub><var>i</var></sub> </span>.
+O valor que a tabela <var>A</var> associa com a chave 
+<var>k</var><sub><var>i</var></sub> é 
+uma referência 
+a&nbsp;<var>T</var><sub><var>i</var></sub>.
+
+
+</li><li class="item">
+Para procurar por uma chave <var>x</var>,
+escolha o maior <var>i</var> tal que 
+<span class="nw"><var>k</var><sub><var>i</var></sub> ≤ <var>x</var></span>,
+use a tabela interna <var>A</var> para
+localizar&nbsp;<span class="nw"><var>T</var><sub><var>i</var></sub> </span>,
+e então procure por <var>x</var>
+em&nbsp;<span class="nw"><var>T</var><sub><var>i</var></sub> </span>.
+Se um tal <var>i</var> não existe,
+<var>x</var>&nbsp;não está na tabela de símbolos original&nbsp;<var>T</var>.
+
+
+</li><li class="item">
+Que acontece se a tabela interna <var>A</var>
+for grande demais para caber na memória rápida?&nbsp;
+Em outras palavras, que acontece se <var>A</var> for muito maior 
+que qualquer <span class="nw"><var>T</var><sub><var>i</var></sub> </span>?&nbsp;&nbsp;
+Nesse caso,
+aplique a <var>A</var> a mesma ideia de segmentação 
+que aplicamos a&nbsp;<var>T</var> e 
+repita, recursivamente, se necessário.&nbsp;
+Isso resulta em uma árvore cujos nós são tabelas de símbolos.
+Esta é a origem do conceito de árvore&nbsp;B.
+
+
+</li><li class="item">
+Convém impor restrições ao número de chaves em cada nó da árvore.
+Escolha um inteiro positivo par&nbsp;<var>M</var>,
+e organize as coisas de modo que
+cada nó
+da árvore tenha no máximo <span class="nw"><var>M</var>−1</span> chaves
+e no mínimo&nbsp;<var>M</var>/2 chaves.
+(A&nbsp;raiz
+é excepcional: basta que ela tenha duas ou mais chaves.)
+
+
+</li><li class="item">
+Exemplo de uma árvore&nbsp;B com <span class="nw"><var>M</var> = 6</span>.&nbsp;
+As chaves são <tt>*</tt>, <tt>B</tt>, 
+<span class="nw"><tt>C</tt>, … </span> ,
+<tt>X</tt>, <tt>Y</tt>.
+As chaves são comparadas em ordem alfabética
+(assim, <tt>*</tt> é a menor das chaves.)&nbsp;
+Um nó com <var>m</var> chaves é chamado <var>m</var>-nó.
+
+<p class="fig">
+<img class="noborder h180" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/Banatomy.png" title="Copied from Algorithms, 4th. ed., by Sedgewick and Wayne" alt="[Anatomy of a B-tree set (M = 6)]">
+
+
+</p></li><li class="item">
+Nossos exemplos usam valores pequenos de&nbsp;<var>M</var>,
+como 4 ou&nbsp;6.&nbsp;
+Um valor mais realistas pode ficar em torno de&nbsp;1000.&nbsp;
+Na prática,
+cada nó é um arquivo (=&nbsp;file), 
+armazenado na memória lenta,
+ou uma página na teia WWW.
+
+</li></ul>
+
+
+
+
+
+
+
+
+
+<h2 class="aula">Árvores B</h2>
+
+<ul>
+
+
+
+<li class="item">
+Definição (Bayer e McCreight, 1972):&nbsp;
+Para qualquer inteiro positivo par&nbsp;<var>M</var>,
+uma <dfn>árvore&nbsp;B</dfn> (B-tree) <dfn>de ordem&nbsp;<var>M</var></dfn>
+é uma árvore com as seguintes propriedades:
+  <ul>
+  <li>
+  cada nó contém no máximo <span class="nw"><var>M</var>−1</span> chaves,
+  </li><li>
+  a raiz contém no mínimo&nbsp;2 chaves
+  e cada um dos demais nós contém no mínimo&nbsp;<var>M</var>/2 chaves,
+  </li><li>
+  cada nó que não seja uma folha
+  tem um filho para cada uma de suas chaves,
+  </li><li>
+  todos os caminhos da raiz até uma folha
+  têm o mesmo comprimento
+  (ou seja, a árvore é <em>perfeitamente balanceada</em>).
+  </li></ul>
+
+
+
+</li><li class="item">
+Uma árvore&nbsp;B de ordem 4 é essencialmente uma 
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-twothree.html">árvore&nbsp;2-3</a>
+(embora existam algumas difereças que destacaremos adiante).
+
+
+
+</li><li class="item">
+<em>Aplicações</em>.
+Árvores&nbsp;B são a estrutura subjacente a muitos 
+sistemas de arquivos
+e bancos de dados.&nbsp;
+Por exemplo, 
+  <ul>
+  <li>o sistema de arquivos NTFS do Windows,
+  </li><li>o sistema de arquivos HFS do Mac,
+  </li><li>os sistemas de arquivos ReiserFS, XFS, Ext3FS, JFS do Linux,&nbsp;e
+  </li><li>os bancos de dados ORACLE, DB2, INGRES, SQL e PostgreSQL.
+  </li></ul>
+
+
+
+</li></ul>
+
+
+ 
+
+
+
+<h2 class="aula">Nós versus páginas</h2>
+
+
+<ul>
+
+<li class="item">
+Usaremos a palavra <dfn>página</dfn>
+para designar um nó de uma árvore&nbsp;B.&nbsp;
+As folhas da árvore são páginas <dfn>externas</dfn>
+e os demais nós são páginas <dfn>internas</dfn>.
+
+
+
+
+</li><li class="item">
+As páginas externas armazenam a TS do cliente.
+Elas associam chaves com valores do cliente.
+
+
+</li><li class="item">
+As páginas internas implementam as TSs auxiliares.
+Elas associam chaves com outras páginas (internas ou externas)
+da maneira já indicada acima:&nbsp;
+o valor associado com uma chave&nbsp;<var>k</var> 
+em uma página interna&nbsp;<var>A</var>
+é uma referência à página que é raiz da subárvore
+que contém todas as chaves 
+maiores-ou-iguais a <var>k</var> e 
+(se <var>k</var> não é a última chave)
+menores que a chave seguinte da página&nbsp;<var>A</var>.
+
+
+
+</li><li class="item" id="SET">
+
+Conjuntos ordenados:
+Deste ponto em diante, para simplificar a discussão, 
+vamos tratar apenas de árvores&nbsp;B que implementam
+a abstração <a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-applications.html#SET"><tt>SET</tt></a>,
+ou seja, um conjunto de chaves comparáveis
+sem valores associados às chaves.
+
+
+
+</li><li class="item">
+As páginas de nossas árvores&nbsp;B
+serão implementadas por uma classe <tt>Page</tt>,
+bem mais rica que a classe <tt>Node</tt>
+que usamos para representar os nós de árvores binárias.
+Além de variáveis de instância, 
+cada <tt>Page</tt>
+terá vários métodos para operar sobre a página.&nbsp;
+Eis a API da classe:
+<table class="api">
+<tbody><tr>
+<td class="tt2" colspan="3">
+public class <span class="orange">Page</span>&lt;Key&gt;
+
+</td></tr><tr>
+<td class="hr" colspan="3"><hr>
+</td></tr><tr>
+<td class="tt1">&nbsp;
+</td><td class="tt2">Page(boolean bottom)
+</td><td class="blb">
+                cria e abre uma página (externa ou interna)
+</td></tr><tr>
+<td class="tt1">void
+</td><td class="tt2">close()
+</td><td class="blb">
+                fecha esta página
+</td></tr><tr>
+<td class="tt1">void
+</td><td class="tt2">insert(Key key)
+</td><td class="blb">
+                insere a chave <tt>key</tt> nesta página (externa)
+</td></tr><tr>
+<td class="tt1"><span class="orange">void</span>
+</td><td class="tt2"><span class="orange">enter(Page p)</span>
+</td><td class="blb"><span class="orange">
+                insere nesta página (interna) um par que<br>
+                
+                &nbsp; &nbsp; associa a menor chave 
+                de <tt>p</tt> com <tt>p</tt></span>
+</td></tr><tr>
+<td class="tt1">boolean
+</td><td class="tt2">isExternal()
+</td><td class="blb">
+                esta página é externa?
+</td></tr><tr>
+<td class="tt1">boolean
+</td><td class="tt2">holds(Key key)
+</td><td class="blb">
+                a chave <tt>key</tt> está nesta página?
+</td></tr><tr>
+<td class="tt1"><span class="orange">Page</span>
+</td><td class="tt2"><span class="orange">next(Key key)</span>
+</td><td class="blb"><span class="orange">
+                a subárvore que poderia conter <tt>key</tt></span>
+</td></tr><tr>
+<td class="tt1">boolean
+</td><td class="tt2">hasOverflowed
+</td><td class="blb">
+                esta página transbordou (já tem <var>M</var> chaves)?
+</td></tr><tr>
+<td class="tt1"><span class="orange">Page</span>
+</td><td class="tt2"><span class="orange">split()</span>
+</td><td class="blb"><span class="orange">
+                transfere as maiores <var>M</var>/2 chaves desta página<br>
+                &nbsp; &nbsp; para uma nova página</span>
+</td></tr><tr>
+<td class="tt1"><span class="pullleft">Iterable&lt;Key&gt;</span>
+</td><td class="tt2">keys()
+</td><td class="blb">
+                iterador para as chaves desta página
+</td></tr></tbody></table>
+
+
+
+</li><li class="item">
+<img class="h13" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/attention-black-on-yellow.jpg" alt="[!]">
+Documentação adicional
+(que deveria, a rigor, fazer parte da API):
+  <ul>
+  <li>
+  O construtor <tt>Page()</tt> cria uma nova página.
+  A página é externa se o argumento for <tt>true</tt>.
+  </li><li>
+  A operação de <em>abertura</em> de uma página
+  traz a página da memória lenta para a rápida.
+  </li><li>
+  A operação <tt>close()</tt> transfere a página 
+  da memória rápida para a lenta.
+  </li><li>
+  Se <tt>this</tt> é uma página externa
+  (que já está aberta),
+  a operação <tt>this.insert(key)</tt>
+  acrescenta a <tt>this</tt> a chave <tt>key</tt>.
+  Com isso, a página <tt>this</tt> pode violar o limite
+  de <span class="nw"><var>M</var>−1</span> chaves,
+  mas isso será corrigido por uma futura invocação de <tt>split()</tt>.
+  </li><li>
+  Se <tt>this</tt> é uma página interna
+  (aberta)
+  e <tt>p</tt> é uma página qualquer,
+  a operação <tt>this.enter(p)</tt>
+  abre a página <tt>p</tt> e
+  insere na página <tt>this</tt>
+  
+  o par <tt class="ws">(key, p)</tt>,
+  sendo <tt>key</tt> a menor chave em&nbsp;<tt>p</tt>.
+  </li><li>
+  Se <tt>this</tt> é uma página interna,
+  a operação <tt>this.next(key)</tt>
+  produz a página associada a <tt>key</tt> em <tt>this</tt>.
+
+  </li><li>
+  A operação <tt>split()</tt>
+  é invocada quando a página já tem <var>M</var> chaves
+  (ou seja, já transbordou).
+  A&nbsp;operação cria uma nova página
+  para a qual são transferidas as <var>M</var>/2 maiores chaves
+  da página original.
+  A nova página é externa se a original era externa 
+  e interna em caso contrário.
+  </li></ul>
+
+
+
+
+</li><li class="item">
+Implementar a classe <tt>Page</tt> é um bom exercício.
+
+</li></ul>
+
+
+
+
+
+<h3 class="aula">Exercícios 1</h3>
+
+<ol class="exr">
+
+<li class="itemexr">
+(SW 6.15)&nbsp;
+Escreva uma implementação da classe <tt>Page</tt> 
+que represente 
+
+cada página como um objeto
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-bin-search.html#BinarySearchST"><tt>BinarySearchST</tt></a>.&nbsp;
+Suponha que as páginas são arquivos no seu disco rígido.
+Repita o exercício supondo que as páginas são arquivos 
+na teia&nbsp;WWW.
+
+
+</li></ol>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2 class="aula">Busca e inserção</h2>
+
+<ul>
+
+<li class="item">
+Exemplo.
+Busca pela chave <tt>E</tt> em uma árvore&nbsp;B de ordem&nbsp;6
+que armazena as chaves <tt>*</tt>, <tt>B</tt>, <span class="nw"><tt>C</tt>, … </span> ,
+<tt>W</tt>,&nbsp;<tt>X</tt>.&nbsp;
+A&nbsp;menor das chaves é <tt>*</tt> 
+e as demais chaves são comparadas alfabeticamente:
+
+<p class="fig">
+<img class="noborder h180" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/Bsearch.png" title="Copied from Algorithms, 4th. ed., by Sedgewick and Wayne" alt="[Searching in a B-tree set (M = 6)]">
+
+
+</p></li><li class="item">
+Exemplo.
+Inserção da chave <tt>A</tt> em uma árvore&nbsp;B de ordem&nbsp;6
+que armazena as chaves <tt>*</tt>, <tt>B</tt>, <span class="nw"><tt>C</tt>, … </span>,
+<tt>W</tt>,&nbsp;<tt>X</tt>.&nbsp;
+A&nbsp;menor das chaves é <tt>*</tt> 
+e as demais chaves são comparadas alfabeticamente:
+
+<p class="fig">
+<img class="noborder h360" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/Binsert.png" title="Copied from Algorithms, 4th. ed., by Sedgewick and Wayne" alt="[Inserting a new key into a B-tree set]">
+
+
+</p></li></ul>
+
+
+
+
+
+
+
+
+<h2 class="aula">Implementação de árvore B</h2>
+
+<ul>
+
+<li class="item" id="sentinel">
+A inserção de uma chave
+é mais complexa quando a nova chave é menor que 
+a menor chave da árvore.&nbsp;
+Para evitar esse caso especial,
+faremos com que a árvore tenha, desde sua criação,  
+uma chave <em>sentinela</em>
+menor que qualquer chave que um cliente venha a inserir
+(veja a chave&nbsp;<tt>*</tt> nos exemplos acima).
+
+
+</li><li class="item" id="BTreeSET">
+Algoritmo 6.12: A classe <span class="orange">BTreeSET</span>
+implementa uma TS do tipo 
+<a href="https://www.ime.usp.br/~pf/estruturas-de-dados/aulas/st-applications.html#SET"><tt>SET</tt></a>
+(sem valores associados às chaves, portanto).&nbsp;
+A operação de inserção é chamada <tt>add()</tt>
+e a operação de busca é chamada <tt>contains()</tt>.
+Suporemos que o cliente jamais insere uma chave 
+menor que a chave mínima da árvore:
+<pre class="fcode">public class BTreeSET&lt;Key extends Comparable&lt;Key&gt;&gt; {
+
+   private Page root = new Page(true);
+
+   public BTreeSET(Key sentinel) { 
+      add(sentinel); 
+   }
+
+   public boolean contains(Key key) { 
+      return contains(root, key); 
+   }
+
+   private boolean contains(Page h, Key key) {
+      if (h.isExternal()) return h.holds(key);
+      return contains(h.next(key), key);
+   }
+
+   public void add(Key key) {
+      add(root, key);
+      if (root.hasOverflowed()) {
+         Page lefthalf = root;
+         Page righthalf = root.split();
+         root = new Page(false);
+         root.enter(lefthalf);
+         root.enter(righthalf);
+      }
+   }
+
+   public void add(Page h, Key key) {
+      if (h.isExternal()) { 
+         h.insert(key); 
+         return; 
+      }
+      Page next = h.next(key);
+      add(next, key);
+      if (next.hasOverflowed())
+         h.enter(next.split());
+      next.close();
+   }
+}
+</pre>
+
+
+
+
+
+
+
+
+
+</li><li class="item">
+Documentação adicional 
+(que deveria, a rigor, fazer parte da API de <tt>BTreeSET</tt>):
+  <ul>
+  <li>
+  A operação privada <tt>add()</tt> com argumentos <tt>h</tt>
+  e <tt>key</tt> insere a chave <tt>key</tt> 
+  na subárvore cuja raiz é&nbsp;<tt>h</tt>.
+  (Supõe-se que <tt>key</tt> não é menor que a chave mínima da árvore.)&nbsp;
+  A&nbsp;chave é inserida na página externa apropriada
+  (e&nbsp;isso pode levar à criação uma nova página externa).
+  Na subárvore resultante,
+  todas as páginas terão entre <var>M</var>/2 
+  e <span class="nw"><var>M</var>−1</span> chaves
+  exceto a página&nbsp;<tt>h</tt>, 
+  que poderá ter até <var>M</var> chaves.
+  </li><li>
+  A operação pública <tt>add()</tt> com argumento <tt>key</tt>
+  insere a chave <tt>key</tt> na árvore.
+  (Supõe-se que <tt>key</tt> não é menor que a chave mínima da árvore.)&nbsp;
+  A chave é inserida na página externa apropriada
+  (e&nbsp;isso pode envolver a criação uma nova página externa).
+  Se a raiz transbordar,
+  ela será dividida em duas e uma nova raiz será criada 
+  tendo como filhos as duas metades da raiz original.
+  </li></ul>
+
+
+
+</li><li class="item">
+Exemplo. A figura mostra a evolução do conjunto de páginas externas 
+de uma árvore&nbsp;B de ordem&nbsp;8.
+Cada linha da figura (há mais de 160 delas)
+mostra o resultado da inserção de uma chave em alguma página externa.
+Cada pequena barra horizontal representa uma página externa;
+a porção preta da barra é a parte ocupada da página e 
+a porção branca é a parte desocupada.
+Cada barra vermelha representa uma página externa cheia que está 
+prestes a receber uma nova chave e transbordar.&nbsp;
+Começamos com uma só página externa (cheia) 
+e terminamos com 22 páginas externas.
+A figura tem alguns erros que cabe a você encontrar.
+
+<p class="fig">
+<img class="noborder h700" src="%C3%81rvores%20B%20(B-trees)%20para%20implementa%C3%A7%C3%A3o%20de%20tabelas%20de%20s%C3%ADmbolos_files/BsimPageNew.png" title="Copied from Algorithms, 4th. ed., by Sedgewick and Wayne" alt="[Building a large B-tree (p.873)]">
+
+
+
+
+</p></li></ul>
+
+
+
+
+
+
+
+<h3 class="aula">Exercícios 2</h3>
+
+<ol class="exr">
+
+<li class="itemexr">
+O código de <tt>BTreeSET</tt> funciona corretamente
+se as páginas têm menos que <var>M</var>/2 chaves
+ou a raiz tem menos que 2 chaves?
+
+
+
+</li><li class="itemexr">
+(SW 6.16)&nbsp;
+Estenda <tt>BTreeSET</tt>
+a uma implementação <tt>BTreeST</tt> mais geral,
+que associe valores a chaves.
+Inclua as operações
+<tt>min()</tt>, <tt>max()</tt>, <tt>floor()</tt>, <tt>ceiling()</tt>,
+<tt>deleteMin()</tt>, <tt>deleteMax()</tt>, <tt>select()</tt>, <tt>rank()</tt>,
+e as versões de dois argumentos de <tt>size()</tt> e <tt>get()</tt>.
+
+
+</li><li class="itemexr">
+(SW 6.17)&nbsp;
+Use <tt>StdDraw</tt> para visualizar a evolução de uma árvore&nbsp;B
+à medida que ela cresce,
+como no exemplo acima.
+
+
+
+</li><li class="itemexr">
+(SW 6.21)&nbsp;
+Escreva um programa que calcule o número médio de páginas externas
+de uma árvore&nbsp;B de ordem&nbsp;<var>M</var>
+construída com <var>N</var> inserções aleatórias
+a partir de uma árvore vazia.
+Execute seu programa para valores razoáveis de <var>M</var> e&nbsp;<var>N</var>.
+
+
+</li><li class="itemexr">
+(SW 6.22)&nbsp;
+Se seu sistema tem memória virtual,
+projete e execute experimentos para comparar o desempenho de árvores&nbsp;B
+com o desempenho da busca binária
+para buscas aleatórias em uma TS enorme.
+
+</li></ol>
+
+
+
+
+  
+
+
+<h2 class="aula">Desempenho</h2>
+
+<ul>
+
+<li class="item">
+O consumo de tempo de cada operação na memória rápida
+é muito menor que o tempo necessário para trazer uma página
+da memória lenta para a rápida
+ou levar uma página da memória rápida para a lenta.
+Assim,
+faz sentido ignorar o custo 
+das operações na memória rápida
+
+e contar apenas o número de sondagens.
+
+
+</li><li class="item">
+Uma <dfn>sondagem</dfn>
+é o primeiro acesso a uma página durante uma busca ou inserção.
+
+
+
+
+
+
+</li><li class="item">
+Proposição. 
+Uma busca ou inserção em uma árvore&nbsp;B
+de ordem <var>M</var> com <var>N</var> chaves
+envolve entre&nbsp; 
+<span class="nw">log<sub class="log"><var>M</var></sub> <var>N</var></span>&nbsp;
+e&nbsp;
+<span class="nw">log<sub class="log"><var>M</var>/2</sub> <var>N</var></span>&nbsp;
+sondagens.
+
+</li><li class="item">
+Prova: O número de sondagens é igual à altura da árvore.
+No melhor caso, todas as páginas internas têm  
+<span class="nw"><var>M</var>−1</span> filhos.
+No pior caso, 
+todas as páginas internas (exceto a raiz)
+têm  
+<span class="nw"><var>M</var>/2</span> filhos.
+
+
+</li><li class="item">
+Se <var>M</var> é da ordem de 1000, por exemplo,
+a altura da árvore não pasa de&nbsp;4
+se <var>N</var> for menor que 62&nbsp;bilhões.
+
+</li></ul>
+
+
+
+
+
+
+
+<h3 class="aula">Exercícios 3</h3>
+
+<ol class="exr">
+
+<li class="itemexr">
+(SW 6.23)&nbsp;
+Para a implementação de <tt>Page</tt> que usa <tt>BinarySearchST</tt>
+(veja exercício SW&nbsp;6.15),
+faça experimentos para determinar o valor de <var>M</var>
+que produz a busca mais rápida por chaves aleatórias
+em uma TS enorme implementada em uma árvore&nbsp;B.
+Restrinja os valores de <var>M</var> a múltiplos de&nbsp;100.
+
+
+</li><li class="itemexr">
+(SW 6.24)&nbsp;
+Faça experimentos para comparar os tempos da busca aleatória em
+grandes tabelas de símbolos usando as seguintes implementações:&nbsp;
+árvore&nbsp;B residente na memória rápida
+(usando o valor de <var>M</var> determinado na exercício SW&nbsp;6.23),
+hashing com sondagem linear,
+árvores rubro-negras.
+
+</li></ol>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="q-and-a">
+<hr>
+<h2 class="q-and-a" id="q-and-a">Perguntas e respostas</h2>
+
+<ul>
+
+<li id="why-B-tree">
+<span class="sc">Pergunta:</span>&nbsp;
+De onde vem o <q>B</q> de <q>B-árvore</q>?
+
+<p>
+<span class="sc">Resposta:</span>&nbsp;
+As B-árvores foram inventadas e batizadas por 
+Bayer e McCreight (em 1972).&nbsp;
+Segundo <a href="https://www.ime.usp.br/~pf/estruturas-de-dados/resources.html#CLRS3">CLRS</a>,
+eles não explicaram por que escolheram esse nome.
+
+
+</p></li><li id="names">
+<span class="sc">Pergunta:</span>&nbsp;
+Por que os nomes dos métodos da classe <tt>Page</tt>
+são diferentes dos que estão no livro?
+
+<p>
+<span class="sc">Resposta:</span>&nbsp;
+O livro escreve <q><tt>add</tt></q> 
+no lugar dos meus <q><tt>insert</tt></q> e <q><tt>enter</tt></q>.
+Escreve <q><tt>contains</tt></q>
+no lugar do meu <q><tt>holds</tt></q>.
+Também escreve <q><tt>isFull</tt></q>
+no lugar do meu <q><tt>hasOverflowed</tt></q>.&nbsp;
+Mudei os nomes que estão no livro
+para que a leitura do código de <tt>BTreeSET</tt>&nbsp;—
+que tem seus próprios métodos <tt>add()</tt> e <tt>contains()</tt>&nbsp;—
+fique mais fácil.
+
+
+
+</p></li></ul>
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+<hr class="footer">
+<p class="footer">
+Quora:
+<q>If Hash Map has the search complexity of O(1) and B tree has O(Log n), 
+why does the database index use B tree and not Hash Map?</q>
+<a href="https://www.quora.com/If-Hash-Map-has-the-search-complexity-of-O-1-and-B-tree-has-O-Log-n-why-does-the-database-index-use-B-tree-and-not-Hash-Map/answer/Michael-Veksler?share=4bc9e8f4&amp;srid=dTB8">Resposta de Michael Veksler</a>.
+
+
+
+
+
+</p><hr class="footer2">
+<p class="footer-nw">
+www.ime.usp.br/~pf/estruturas-de-dados/<br>
+Atualizado em 2019-01-01<br>
+<em>Paulo Feofiloff</em><br>
+<a href="https://www.ime.usp.br/dcc/">Departamento de Ciência da Computação</a><br>
+<a href="https://www.ime.usp.br/">Instituto de Matemática e Estatística</a> da
+<a href="https://www.usp.br/"><abbr title="Universidade de São Paulo">USP</abbr></a>
+
+
+
+
+
+</p><p class="end-of-page">&nbsp;
+
+
+
+</p></body></html>

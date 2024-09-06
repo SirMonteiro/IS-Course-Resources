@@ -24,6 +24,14 @@ bool inicializaGrafo(Grafo* grafo, int nv) {
     return true;
 }
 
+int obtemNrVertices(Grafo* grafo) {
+    return grafo->numVertices;
+}
+
+int obtemNrArestas(Grafo* grafo) {
+    return grafo->numArestas;
+}
+
 void imprimeGrafo(Grafo* grafo) {
     for (int i = 0; i < grafo->numVertices; i++) {
         for (int j = 0; j < grafo->numVertices; j++) {
@@ -64,6 +72,11 @@ bool existeAresta(Grafo *grafo, int v1, int v2) {
     return false;
 }
 
+Peso obtemPesoAresta(Grafo *grafo, int v1, int v2) {
+    if (!(verificaValidadeVertice(grafo, v1) && verificaValidadeVertice(grafo, v2))) return false;
+    return grafo->mat[v1][v2];
+}
+
 bool removeAresta(Grafo *grafo, int v1, int v2, Peso *peso) {
     if (!(verificaValidadeVertice(grafo, v1) && verificaValidadeVertice(grafo, v2))) return false;
     if (!existeAresta(grafo, v1, v2)) return false;
@@ -88,12 +101,27 @@ bool listaAdjVazia(Grafo *grafo, int v) {
     return true;
 }
 
-int proxListaAdj(Grafo *grafo, int v, int atual) {
+Apontador primeiroListaAdj(Grafo *grafo, int v) {
+    for (int i = 0; i < grafo->numVertices; i++) {
+        Apontador p = grafo->mat[v][i];
+        if (p != AN) return i;
+        // return p;
+    }
+    return AN;
+}
+
+Apontador proxListaAdj(Grafo *grafo, int v, Apontador atual) {
     if (!(verificaValidadeVertice(grafo, v) && verificaValidadeVertice(grafo, atual))) return VERTICE_INVALIDO;
 
     for (int i = atual + 1; i < grafo->numVertices; i++) {
         if (grafo->mat[v][i] != AN) return i;
     }
     return VERTICE_INVALIDO;
-
 }
+
+int obtemVerticeDestino(Grafo* grafo, Apontador p) {
+    if(!verificaValidadeVertice(grafo, p)) return VERTICE_INVALIDO;
+    return p;
+}
+
+void liberaGrafo(Grafo* grafo) {}

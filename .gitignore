@@ -11,6 +11,8 @@ gabideca/
 .idea/
 .vscode/
 cmake-build-debug/
+tmp/
+temp/
 
 # From https://github.com/github/gitignore/blob/main/R.gitignore
 # History files
